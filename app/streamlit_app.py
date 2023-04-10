@@ -7,7 +7,7 @@ import zipfile
 import io 
 import itertools
 import operator as op
-
+import requests
 # ---------------------------------------------------------------------
 # Config streamlit
 #-----------------------------------------------------------------------------------
@@ -20,24 +20,17 @@ st.set_page_config(page_title="Proto LOTO", page_icon=":tada:", layout="wide")
 
 # Recuperation du fichier sur le site du loto
 url = "https://media.fdj.fr/static-draws/csv/loto/loto_201911.zip" # URL du fichier zip à télécharger
-filename = "fichier.zip" # Nom du fichier zip à enregistrer
-foldername = "/home/kevin/workspace/py-sql/loto/data" # Nom du dossier où extraire le contenu du fichier zip
 
-# Télécharger le fichier zip
-urllib.request.urlretrieve(url, filename)
+response = requests.get(url)
+zip_file = zipfile.ZipFile(io.BytesIO(response.content))
 
-# Ouvrir le fichier zip
-zip = zipfile.ZipFile(filename)
+# Décompression du fichier ZIP
+zip_file.extractall()
+zip_file.close()
 
-# Extraire le contenu du fichier zip dans un dossier
-zip.extractall(foldername)
-
-# Fermer le fichier zip
-zip.close()
-
-
-# Conversion du csv en dataframe
-data = pd.read_csv("/home/kevin/workspace/py-sql/loto/data/loto_201911.csv", sep=";")
+# Lecture du fichier CSV
+with open(zip_file.namelist()[0], 'r') as file:
+    data = pd.read_csv(file, sep=";")
 
 # Nettoyage du Dataset pour avoir uniquement des nombres et pas des strings
 for i in range(2,8):
