@@ -346,7 +346,6 @@ for combi in combinaison:
                                 
                                 jeux_df = pd.concat([jeux_df, temp_df], ignore_index=True)
                                 count+=1
-                                print(tirage)
                             else:
                                 pass
                         else:
